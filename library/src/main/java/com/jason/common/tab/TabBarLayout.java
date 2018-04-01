@@ -1,6 +1,8 @@
 package com.jason.common.tab;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
@@ -20,6 +22,12 @@ public class TabBarLayout extends AppCompatImageView {
     private OnTabBarClickListener mOnTabBarClickListener;
     private int mTouchSlop;
     private ViewGroup mTabItemContainer;
+
+    private boolean isEnableDividing;
+    private int mDividingLineHeight = -1;
+    private int mDividingLineColor = -1;
+
+    private Paint mPaint;
 
     public TabBarLayout(Context context) {
         this(context, null);
@@ -43,13 +51,29 @@ public class TabBarLayout extends AppCompatImageView {
         mTabItemContainer = viewGroup;
     }
 
-    //TODO 分割线
-    public void showLine() {
+    public void setDividing(int height, int color) {
+        mDividingLineHeight = TabUtil.dp2Px(getContext(), height);
+        mDividingLineColor = color;
+        if (mPaint == null)
+            mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mPaint.setColor(mDividingLineColor);
+        mPaint.setStrokeWidth(mDividingLineHeight);
+    }
 
+    public void enableDividing(boolean enable) {
+        isEnableDividing = enable;
     }
 
     public void setOnTabBarClickListener(OnTabBarClickListener listener) {
         mOnTabBarClickListener = listener;
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+        super.draw(canvas);
+        if (isEnableDividing && mDividingLineHeight > 0 && mDividingLineColor != -1) {
+            canvas.drawLine(0, mDividingLineHeight / 2, getWidth(), mDividingLineHeight / 2, mPaint);
+        }
     }
 
     private float mLastX, mLastY;

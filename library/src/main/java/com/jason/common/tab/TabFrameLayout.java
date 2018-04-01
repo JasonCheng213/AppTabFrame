@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,7 @@ import java.util.List;
  * <p>
  * Created by Jason on 2018/3/26.
  */
-public class TabFrameLayout extends RelativeLayout {
+public class TabFrameLayout extends RelativeLayout implements ViewPager.OnPageChangeListener {
 
     protected SlideViewPager mViewPager;
     protected TabBarLayout mTabBar;
@@ -42,6 +43,7 @@ public class TabFrameLayout extends RelativeLayout {
         mViewPager = findViewById(R.id.pager_main_frame);
         mTabBar = findViewById(R.id.iv_main_frame_tab_background);
         mTabItemContainer = findViewById(R.id.ll_main_frame_tab_container);
+        mViewPager.addOnPageChangeListener(this);
         mTabBar.setOnTabBarClickListener(mOnTabBarClickListener);
 
         mViewPager.setEnableSlide(mBuilder.isEnableSlide);
@@ -54,6 +56,9 @@ public class TabFrameLayout extends RelativeLayout {
         if (mBuilder.mTabBarDrawable != null) {
             mTabBar.setImageDrawable(mBuilder.mTabBarDrawable);
         }
+        if (mBuilder.mTabBarDividingHeight > 0 && mBuilder.mTabBarDividingColor != -1)
+            mTabBar.setDividing(mBuilder.mTabBarDividingHeight, mBuilder.mTabBarDividingColor);
+        mTabBar.enableDividing(mBuilder.isEnableDividing);
         if (mBuilder.mListTabItem.size() != mBuilder.mListFragment.size())
             throw new RuntimeException("tab count mot match fragment count.");
 
@@ -122,6 +127,10 @@ public class TabFrameLayout extends RelativeLayout {
         tabItem.showDecoration(show);
     }
 
+    public TabBarLayout getTabBar() {
+        return mTabBar;
+    }
+
     private TabBarLayout.OnTabBarClickListener mOnTabBarClickListener = new TabBarLayout.OnTabBarClickListener() {
         @Override
         public void onClick(View view, int piece) {
@@ -179,6 +188,21 @@ public class TabFrameLayout extends RelativeLayout {
         }
     }
 
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        //TODO
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        setCurrentTab(position);
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+
     private class TabPagerAdapter extends FragmentPagerAdapter {
 
         private List<Fragment> mFragments;
@@ -209,6 +233,9 @@ public class TabFrameLayout extends RelativeLayout {
         private int mTabBarHeight = -1;
         private int mTabBarColor = -1;
         private Drawable mTabBarDrawable;
+        private int mTabBarDividingHeight = -1;
+        private int mTabBarDividingColor = -1;
+        private boolean isEnableDividing;
         private List<OnTabSelectedListener> mOnTabSelectedListeners;
         private OnTabClickedListener mOnTabClickedListener;
 
@@ -273,6 +300,21 @@ public class TabFrameLayout extends RelativeLayout {
 
         public Builder setTabClickListener(OnTabClickedListener listener) {
             mOnTabClickedListener = listener;
+            return this;
+        }
+
+        public Builder setTabBarDividingHeight(int height) {
+            mTabBarDividingHeight = height;
+            return this;
+        }
+
+        public Builder setTabBarDividingColor(int color) {
+            mTabBarDividingColor = color;
+            return this;
+        }
+
+        public Builder enableDividing(boolean enable) {
+            isEnableDividing = enable;
             return this;
         }
 

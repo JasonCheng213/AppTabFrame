@@ -41,10 +41,8 @@ public class DefaultTabItemView extends LinearLayout implements ITabItem {
         LayoutInflater.from(getContext()).inflate(R.layout.tab_item_layout, this, true);
         ImageView imageView = findViewById(R.id.iv_tab_icon);
         TextView textView = findViewById(R.id.txt_tab_title);
-        if (mBuilder.icon != null) {
-            mBuilder.icon.setBounds(0, 0, mBuilder.iconWidth, mBuilder.iconHeight);
+        if (mBuilder.icon != null)
             imageView.setImageDrawable(mBuilder.icon);
-        }
         if (mBuilder.iconWidth != -1)
             imageView.getLayoutParams().width = TabUtil.dp2Px(getContext(), mBuilder.iconWidth);
         if (mBuilder.iconHeight != -1)
@@ -137,7 +135,7 @@ public class DefaultTabItemView extends LinearLayout implements ITabItem {
             return this;
         }
 
-        public Builder iconDrawable(Drawable val) {
+        public Builder icon(Drawable val) {
             icon = val;
             return this;
         }
