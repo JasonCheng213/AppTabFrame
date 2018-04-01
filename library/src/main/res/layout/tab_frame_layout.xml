@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent">
+
+    <!--Tab Background-->
+    <com.jason.common.tab.TabBarLayout
+        android:id="@+id/iv_main_frame_tab_background"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:scaleType="centerCrop"/>
+
+    <com.jason.common.tab.SlideViewPager
+        android:id="@+id/pager_main_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/iv_main_frame_tab_background"/>
+
+    <!--Tab Container Layer-->
+    <LinearLayout
+        android:id="@+id/ll_main_frame_tab_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="bottom"
+        android:orientation="horizontal"/>
+</merge>
