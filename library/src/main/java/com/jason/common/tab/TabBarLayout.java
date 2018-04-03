@@ -51,8 +51,9 @@ public class TabBarLayout extends AppCompatImageView {
         mTabItemContainer = viewGroup;
     }
 
-    public void setDividing(int height, int color) {
-        mDividingLineHeight = TabUtil.dp2Px(getContext(), height);
+    public void setDividing(float height, int color) {
+        int tmpHeight = TabUtil.dp2Px(getContext(), height);
+        mDividingLineHeight = tmpHeight < 1 ? 1 : tmpHeight;
         mDividingLineColor = color;
         if (mPaint == null)
             mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);

@@ -57,8 +57,15 @@ public class DefaultTabItemView extends LinearLayout implements ITabItem {
             textView.setVisibility(VISIBLE);
             textView.setText(mBuilder.title);
         }
-        if (mBuilder.titlePadding != null && mBuilder.titlePadding.length >= 4)
-            textView.setPadding(TabUtil.dp2Px(getContext(), mBuilder.titlePadding[0]), TabUtil.dp2Px(getContext(), mBuilder.titlePadding[1]), TabUtil.dp2Px(getContext(), mBuilder.titlePadding[2]), TabUtil.dp2Px(getContext(), mBuilder.titlePadding[3]));
+        if (mBuilder.titlePadding != null && mBuilder.titlePadding.length >= 4) {
+            if (textView.getVisibility() == GONE) {
+                setPadding(getPaddingLeft(), getPaddingTop(), getPaddingRight(), getPaddingBottom() + TabUtil.dp2Px(getContext(), mBuilder.titlePadding[1]) + TabUtil.dp2Px(getContext(), mBuilder.titlePadding[3]));
+            } else {
+                textView.setPadding(TabUtil.dp2Px(getContext(), mBuilder.titlePadding[0]), TabUtil.dp2Px(getContext(), mBuilder.titlePadding[1]), TabUtil.dp2Px(getContext(), mBuilder.titlePadding[2]), TabUtil.dp2Px(getContext(), mBuilder.titlePadding[3]));
+            }
+        }
+        if (mBuilder.background != null)
+            setBackgroundDrawable(mBuilder.background);
     }
 
     private ColorStateList createColorStateList(int normal, int select) {
@@ -105,6 +112,8 @@ public class DefaultTabItemView extends LinearLayout implements ITabItem {
         private int iconHeight = -1;
         private int gravity = Gravity.CENTER;
         private DecorationDrawable decorationDrawable;
+        //TODO
+        private Drawable background;
 
         public Builder(Context context) {
             this.context = context;
@@ -157,6 +166,11 @@ public class DefaultTabItemView extends LinearLayout implements ITabItem {
 
         public Builder decorationDrawable(DecorationDrawable val) {
             decorationDrawable = val;
+            return this;
+        }
+
+        public Builder background(Drawable val) {
+            background = val;
             return this;
         }
 

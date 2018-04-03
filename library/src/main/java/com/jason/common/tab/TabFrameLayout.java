@@ -233,7 +233,7 @@ public class TabFrameLayout extends RelativeLayout implements ViewPager.OnPageCh
         private int mTabBarHeight = -1;
         private int mTabBarColor = -1;
         private Drawable mTabBarDrawable;
-        private int mTabBarDividingHeight = -1;
+        private float mTabBarDividingHeight = -1;
         private int mTabBarDividingColor = -1;
         private boolean isEnableDividing;
         private List<OnTabSelectedListener> mOnTabSelectedListeners;
@@ -303,7 +303,7 @@ public class TabFrameLayout extends RelativeLayout implements ViewPager.OnPageCh
             return this;
         }
 
-        public Builder setTabBarDividingHeight(int height) {
+        public Builder setTabBarDividingHeight(float height) {
             mTabBarDividingHeight = height;
             return this;
         }
