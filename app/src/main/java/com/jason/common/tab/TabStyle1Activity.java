@@ -52,7 +52,7 @@ public class TabStyle1Activity extends AppCompatActivity {
                 .icon(ContextCompat.getDrawable(getApplicationContext(), iconRes))
                 .iconWidth(18)
                 .iconHeight(18)
-//                .background(ContextCompat.getDrawable(getApplicationContext(), R.drawable.tab_background_selector))
+                .background(ContextCompat.getDrawable(getApplicationContext(), R.drawable.tab_background_selector))
                 .build();
     }
 }

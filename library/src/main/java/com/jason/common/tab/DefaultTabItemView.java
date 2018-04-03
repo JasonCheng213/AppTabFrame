@@ -112,7 +112,6 @@ public class DefaultTabItemView extends LinearLayout implements ITabItem {
         private int iconHeight = -1;
         private int gravity = Gravity.CENTER;
         private DecorationDrawable decorationDrawable;
-        //TODO
         private Drawable background;
 
         public Builder(Context context) {

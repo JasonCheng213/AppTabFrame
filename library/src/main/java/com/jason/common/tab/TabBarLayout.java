@@ -3,25 +3,26 @@ package com.jason.common.tab;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 /**
- * 横向平均分块点击监听
+ * Tab Bar Layout
  * <p>
  * Created by Jason on 2018/3/28.
  */
 
-public class TabBarLayout extends AppCompatImageView {
+public class TabBarLayout extends FrameLayout implements View.OnClickListener {
 
     private OnTabBarClickListener mOnTabBarClickListener;
-    private int mTouchSlop;
-    private ViewGroup mTabItemContainer;
+    private ImageView mTabBackground;
+    private LinearLayout mTabClickContainer;
 
     private boolean isEnableDividing;
     private int mDividingLineHeight = -1;
@@ -43,12 +44,31 @@ public class TabBarLayout extends AppCompatImageView {
     }
 
     private void init() {
-        setClickable(true);
-        mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
+        mTabBackground = new ImageView(getContext());
+        mTabBackground.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        mTabClickContainer = new LinearLayout(getContext());
+        addView(mTabBackground, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        addView(mTabClickContainer, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
 
     public void bindTabItemContainer(ViewGroup viewGroup) {
-        mTabItemContainer = viewGroup;
+        for (int i = 0; i < viewGroup.getChildCount(); i++) {
+            View clickView = new View(getContext());
+            clickView.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+            clickView.setOnClickListener(this);
+            clickView.setTag(i);
+            clickView.setClickable(true);
+            Drawable background = viewGroup.getChildAt(i).getBackground();
+            if (background != null) {
+                viewGroup.getChildAt(i).setBackgroundDrawable(null);
+                clickView.setBackgroundDrawable(background);
+            }
+            mTabClickContainer.addView(clickView);
+        }
+    }
+
+    public void setTabBackground(Drawable drawable) {
+        mTabBackground.setImageDrawable(drawable);
     }
 
     public void setDividing(float height, int color) {
@@ -77,27 +97,10 @@ public class TabBarLayout extends AppCompatImageView {
         }
     }
 
-    private float mLastX, mLastY;
-
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            mLastX = event.getX();
-            mLastY = event.getY();
-        } else if (event.getAction() == MotionEvent.ACTION_UP) {
-            if (Math.abs(event.getX() - mLastX) <= mTouchSlop && Math.abs(event.getY() - mLastY) <= mTouchSlop) {
-                tap(mLastX, mLastY);
-            }
-        }
-        return true;
-    }
-
-    private void tap(float x, float y) {
-        if (mTabItemContainer == null)
-            throw new RuntimeException("did you call bindTabItemContainer()?");
-        int position = (int) (x / (getWidth() / mTabItemContainer.getChildCount()));
+    public void onClick(View view) {
         if (mOnTabBarClickListener != null)
-            mOnTabBarClickListener.onClick(this, position);
+            mOnTabBarClickListener.onClick(this, (Integer) view.getTag());
     }
 
     public interface OnTabBarClickListener {

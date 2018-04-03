@@ -54,7 +54,7 @@ public class TabFrameLayout extends RelativeLayout implements ViewPager.OnPageCh
             mTabBar.setBackgroundColor(mBuilder.mTabBarColor);
         }
         if (mBuilder.mTabBarDrawable != null) {
-            mTabBar.setImageDrawable(mBuilder.mTabBarDrawable);
+            mTabBar.setTabBackground(mBuilder.mTabBarDrawable);
         }
         if (mBuilder.mTabBarDividingHeight > 0 && mBuilder.mTabBarDividingColor != -1)
             mTabBar.setDividing(mBuilder.mTabBarDividingHeight, mBuilder.mTabBarDividingColor);
