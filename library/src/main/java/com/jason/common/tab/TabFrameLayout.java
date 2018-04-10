@@ -29,7 +29,7 @@ public class TabFrameLayout extends RelativeLayout implements ViewPager.OnPageCh
 
     private Builder mBuilder;
 
-    private int mLastClickPosition = 0;
+    private int mLastSelectedPosition = 0;
 
     private TabFrameLayout(Context context, Builder builder) {
         super(context);
@@ -75,7 +75,7 @@ public class TabFrameLayout extends RelativeLayout implements ViewPager.OnPageCh
     }
 
     public int getCurrentTabPosition() {
-        return mLastClickPosition;
+        return mLastSelectedPosition;
     }
 
     public int getTabPositionByKey(String key) {
@@ -133,49 +133,50 @@ public class TabFrameLayout extends RelativeLayout implements ViewPager.OnPageCh
 
     private TabBarLayout.OnTabBarClickListener mOnTabBarClickListener = new TabBarLayout.OnTabBarClickListener() {
         @Override
-        public void onClick(View view, int piece) {
-            if (mBuilder.mOnTabClickedListener == null) {
-                mBuilder.mOnTabClickedListener = new OnTabClickedListener() {
+        public void onClick(View view, int tab) {
+            if (mBuilder.mOnTabInterruptListener == null) {
+                mBuilder.mOnTabInterruptListener = new OnTabInterruptListener() {
                     @Override
-                    public boolean onInterruptClick(int position, ITabItem tab) {
+                    public boolean onInterruptSelect(int position, ITabItem tab) {
                         return false;
-                    }
-
-                    @Override
-                    public void onTabClicked(int position, ITabItem tab) {
                     }
                 };
             }
 
-            ITabItem clickTabItem = mBuilder.mListTabItem.get(piece);
-
-            mBuilder.mOnTabClickedListener.onTabClicked(piece, clickTabItem);
-            if (!mBuilder.mOnTabClickedListener.onInterruptClick(piece, clickTabItem)) {
-                if (mLastClickPosition == piece) {
-                    if (mBuilder.mOnTabSelectedListeners != null && !mBuilder.mOnTabSelectedListeners.isEmpty()) {
-                        for (OnTabSelectedListener listener : mBuilder.mOnTabSelectedListeners) {
-                            listener.onTabReselected(piece, clickTabItem);
-                        }
-                    }
-                } else {
-                    changeViewSelectState(mBuilder.mListTabItem.get(mLastClickPosition).getTabView(), false);
-                    if (mBuilder.mOnTabSelectedListeners != null && !mBuilder.mOnTabSelectedListeners.isEmpty()) {
-                        for (OnTabSelectedListener listener : mBuilder.mOnTabSelectedListeners) {
-                            listener.onTabUnselected(mLastClickPosition, mBuilder.mListTabItem.get(mLastClickPosition));
-                        }
-                    }
-                    mViewPager.setCurrentItem(piece, mBuilder.isEnableSlide);
-                    changeViewSelectState(clickTabItem.getTabView(), true);
-                    if (mBuilder.mOnTabSelectedListeners != null && !mBuilder.mOnTabSelectedListeners.isEmpty()) {
-                        for (OnTabSelectedListener listener : mBuilder.mOnTabSelectedListeners) {
-                            listener.onTabSelected(piece, clickTabItem);
-                        }
-                    }
+            ITabItem clickTabItem = mBuilder.mListTabItem.get(tab);
+            if (mBuilder.mOnTabSelectedListeners != null && !mBuilder.mOnTabSelectedListeners.isEmpty()) {
+                for (OnTabSelectedListener listener : mBuilder.mOnTabSelectedListeners) {
+                    listener.onTabClicked(tab, clickTabItem);
                 }
-                mLastClickPosition = piece;
             }
+            mViewPager.setCurrentItem(tab, mBuilder.isEnableSlide);
         }
     };
+
+    private void notifyTabChange(int tab) {
+        if (mLastSelectedPosition == tab) {
+            if (mBuilder.mOnTabSelectedListeners != null && !mBuilder.mOnTabSelectedListeners.isEmpty()) {
+                for (OnTabSelectedListener listener : mBuilder.mOnTabSelectedListeners) {
+                    listener.onTabReselected(tab, getTabItem(tab));
+                }
+            }
+        } else {
+            changeViewSelectState(mBuilder.mListTabItem.get(mLastSelectedPosition).getTabView(), false);
+            if (mBuilder.mOnTabSelectedListeners != null && !mBuilder.mOnTabSelectedListeners.isEmpty()) {
+                for (OnTabSelectedListener listener : mBuilder.mOnTabSelectedListeners) {
+                    listener.onTabUnselected(mLastSelectedPosition, mBuilder.mListTabItem.get(mLastSelectedPosition));
+                }
+            }
+            mViewPager.setCurrentItem(tab, mBuilder.isEnableSlide);
+            changeViewSelectState(getTabItem(tab).getTabView(), true);
+            if (mBuilder.mOnTabSelectedListeners != null && !mBuilder.mOnTabSelectedListeners.isEmpty()) {
+                for (OnTabSelectedListener listener : mBuilder.mOnTabSelectedListeners) {
+                    listener.onTabSelected(tab, getTabItem(tab));
+                }
+            }
+        }
+        mLastSelectedPosition = tab;
+    }
 
     private void changeViewSelectState(View view, boolean select) {
         if (view instanceof ViewGroup) {
@@ -190,17 +191,28 @@ public class TabFrameLayout extends RelativeLayout implements ViewPager.OnPageCh
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        //TODO
+        if (mBuilder.mOnPageScrolledListener != null) {
+            mBuilder.mOnPageScrolledListener.onScroll(mLastSelectedPosition, position == mLastSelectedPosition ? mLastSelectedPosition + 1 : position, positionOffset, positionOffsetPixels);
+        }
     }
 
     @Override
     public void onPageSelected(int position) {
-        setCurrentTab(position);
+        if (!mBuilder.mOnTabInterruptListener.onInterruptSelect(position, getTabItem(position))) {
+            notifyTabChange(position);
+        } else {
+            mViewPager.setCurrentItem(mLastSelectedPosition, false);
+        }
+        if (mBuilder.mOnPageScrolledListener != null) {
+            mBuilder.mOnPageScrolledListener.onPageSelected(position);
+        }
     }
 
     @Override
     public void onPageScrollStateChanged(int state) {
-
+        if (mBuilder.mOnPageScrolledListener != null) {
+            mBuilder.mOnPageScrolledListener.onScrollState(state);
+        }
     }
 
     private class TabPagerAdapter extends FragmentPagerAdapter {
@@ -223,7 +235,6 @@ public class TabFrameLayout extends RelativeLayout implements ViewPager.OnPageCh
         }
     }
 
-
     public static class Builder {
 
         private Context mContext;
@@ -237,7 +248,8 @@ public class TabFrameLayout extends RelativeLayout implements ViewPager.OnPageCh
         private int mTabBarDividingColor = -1;
         private boolean isEnableDividing;
         private List<OnTabSelectedListener> mOnTabSelectedListeners;
-        private OnTabClickedListener mOnTabClickedListener;
+        private OnTabInterruptListener mOnTabInterruptListener;
+        private OnPageScrolledListener mOnPageScrolledListener;
 
         private final List<ITabItem> mListTabItem = new ArrayList<>();
         private final List<Fragment> mListFragment = new ArrayList<>();
@@ -298,8 +310,13 @@ public class TabFrameLayout extends RelativeLayout implements ViewPager.OnPageCh
             return this;
         }
 
-        public Builder setTabClickListener(OnTabClickedListener listener) {
-            mOnTabClickedListener = listener;
+        public Builder setTabClickListener(OnTabInterruptListener listener) {
+            mOnTabInterruptListener = listener;
+            return this;
+        }
+
+        public Builder setPageScrolledListener(OnPageScrolledListener listener) {
+            mOnPageScrolledListener = listener;
             return this;
         }
 
@@ -323,19 +340,27 @@ public class TabFrameLayout extends RelativeLayout implements ViewPager.OnPageCh
         }
     }
 
-    public interface OnTabClickedListener {
+    public interface OnTabInterruptListener {
 
-        boolean onInterruptClick(int position, ITabItem tab);
-
-        void onTabClicked(int position, ITabItem tab);
+        boolean onInterruptSelect(int position, ITabItem tab);
     }
 
     public interface OnTabSelectedListener {
+
+        void onTabClicked(int position, ITabItem tab);
 
         void onTabSelected(int position, ITabItem tab);
 
         void onTabUnselected(int position, ITabItem tab);
 
         void onTabReselected(int position, ITabItem tab);
+    }
+
+    public interface OnPageScrolledListener {
+        void onScroll(int position, int toPosition, float positionOffset, int positionOffsetPixels);
+
+        void onPageSelected(int position);
+
+        void onScrollState(int state);
     }
 }

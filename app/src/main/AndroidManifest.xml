@@ -16,8 +16,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".TabStyle1Activity">
-        </activity>
+        <activity android:name=".TabStyle1Activity"/>
+        <activity android:name=".TabStyle2Activity"/>
     </application>
 
 </manifest>

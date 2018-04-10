@@ -37,6 +37,14 @@ public class DefaultTabItemView extends LinearLayout implements ITabItem {
         init();
     }
 
+    public ImageView getIcon() {
+        return findViewById(R.id.iv_tab_icon);
+    }
+
+    public TextView getTitle() {
+        return findViewById(R.id.txt_tab_title);
+    }
+
     private void init() {
         LayoutInflater.from(getContext()).inflate(R.layout.tab_item_layout, this, true);
         ImageView imageView = findViewById(R.id.iv_tab_icon);
