@@ -41,6 +41,13 @@ public class TestFragment extends Fragment {
                 startActivity(TabStyle1Activity.getIntent(getContext()));
             }
         });
+
+        mRootView.findViewById(R.id.btn_tab_style_2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(TabStyle2Activity.getIntent(getContext()));
+            }
+        });
         return mRootView;
     }
 }

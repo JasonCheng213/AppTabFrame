@@ -192,13 +192,14 @@ public class TabFrameLayout extends RelativeLayout implements ViewPager.OnPageCh
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
         if (mBuilder.mOnPageScrolledListener != null) {
-            mBuilder.mOnPageScrolledListener.onScroll(mLastSelectedPosition, position == mLastSelectedPosition ? mLastSelectedPosition + 1 : position, positionOffset, positionOffsetPixels);
+            mTabBar.setScrollEffectBackground(mBuilder.mOnPageScrolledListener.onScroll(position,
+                    positionOffset, positionOffsetPixels, getWidth() / mTabItemContainer.getChildCount()));
         }
     }
 
     @Override
     public void onPageSelected(int position) {
-        if (!mBuilder.mOnTabInterruptListener.onInterruptSelect(position, getTabItem(position))) {
+        if (mBuilder.mOnTabInterruptListener == null || !mBuilder.mOnTabInterruptListener.onInterruptSelect(position, getTabItem(position))) {
             notifyTabChange(position);
         } else {
             mViewPager.setCurrentItem(mLastSelectedPosition, false);
@@ -357,7 +358,8 @@ public class TabFrameLayout extends RelativeLayout implements ViewPager.OnPageCh
     }
 
     public interface OnPageScrolledListener {
-        void onScroll(int position, int toPosition, float positionOffset, int positionOffsetPixels);
+
+        Drawable onScroll(int position, float positionOffset, int positionOffsetPixels, int tabWidth);
 
         void onPageSelected(int position);
 

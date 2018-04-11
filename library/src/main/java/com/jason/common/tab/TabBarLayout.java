@@ -51,6 +51,10 @@ public class TabBarLayout extends FrameLayout implements View.OnClickListener {
         addView(mTabClickContainer, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
 
+    public LinearLayout getTabClickContainer() {
+        return mTabClickContainer;
+    }
+
     public void bindTabItemContainer(ViewGroup viewGroup) {
         for (int i = 0; i < viewGroup.getChildCount(); i++) {
             View clickView = new View(getContext());
@@ -69,6 +73,11 @@ public class TabBarLayout extends FrameLayout implements View.OnClickListener {
 
     public void setTabBackground(Drawable drawable) {
         mTabBackground.setImageDrawable(drawable);
+    }
+
+    public void setScrollEffectBackground(Drawable drawable) {
+        if (drawable != null)
+            mTabClickContainer.setBackgroundDrawable(drawable);
     }
 
     public void setDividing(float height, int color) {

@@ -2,10 +2,18 @@ package com.jason.common.tab;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.Paint;
+import android.graphics.PixelFormat;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 public class TabStyle2Activity extends AppCompatActivity implements TabFrameLayout.OnPageScrolledListener {
 
@@ -44,13 +52,18 @@ public class TabStyle2Activity extends AppCompatActivity implements TabFrameLayo
                 .icon(ContextCompat.getDrawable(getApplicationContext(), iconRes))
                 .iconWidth(18)
                 .iconHeight(18)
-                .background(ContextCompat.getDrawable(getApplicationContext(), R.drawable.tab_background_selector))
                 .build();
     }
 
-    @Override
-    public void onScroll(int position, int toPosition, float positionOffset, int positionOffsetPixels) {
+    IndicatorDrawable mIndicatorDrawable = null;
 
+    @Override
+    public Drawable onScroll(int position, float positionOffset, int positionOffsetPixels, int tabWidth) {
+        if (mIndicatorDrawable == null) {
+            mIndicatorDrawable = new IndicatorDrawable(TabUtil.dp2Px(getApplicationContext(), 5), tabWidth);
+        }
+        mIndicatorDrawable.update((int) (position * tabWidth + positionOffset * tabWidth));
+        return mIndicatorDrawable;
     }
 
     @Override
@@ -59,6 +72,49 @@ public class TabStyle2Activity extends AppCompatActivity implements TabFrameLayo
 
     @Override
     public void onScrollState(int state) {
+    }
+
+    class IndicatorDrawable extends Drawable {
+
+        private int mHeight;
+        private int mWidth;
+        private int x;
+
+        private Paint mPaint;
+
+        public IndicatorDrawable(int height, int width) {
+            mHeight = height;
+            mWidth = width;
+            mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            mPaint.setColor(Color.BLUE);
+            mPaint.setStrokeWidth(mHeight);
+        }
+
+        public void update(int x) {
+            this.x = x;
+            Log.d("jason", "update: " + x);
+            invalidateSelf();
+        }
+
+        @Override
+        public void draw(@NonNull Canvas canvas) {
+            canvas.drawLine(x, getBounds().height() - mHeight / 2, x + mWidth, getBounds().height() - mHeight / 2, mPaint);
+        }
+
+        @Override
+        public void setAlpha(int i) {
+            mPaint.setAlpha(i);
+        }
+
+        @Override
+        public void setColorFilter(@Nullable ColorFilter colorFilter) {
+            mPaint.setColorFilter(colorFilter);
+        }
+
+        @Override
+        public int getOpacity() {
+            return PixelFormat.TRANSLUCENT;
+        }
     }
 }
 

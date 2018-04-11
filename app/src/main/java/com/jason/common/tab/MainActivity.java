@@ -2,6 +2,7 @@ package com.jason.common.tab;
 
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -91,8 +92,8 @@ public class MainActivity extends AppCompatActivity implements TabFrameLayout.On
     }
 
     @Override
-    public void onScroll(int position, int toPosition, float positionOffset, int positionOffsetPixels) {
-        Log.d(TAG, "onScroll: " + position + " " + toPosition + " " + positionOffsetPixels);
+    public Drawable onScroll(int position, float positionOffset, int positionOffsetPixels, int tabWidth) {
+        return null;
     }
 
     @Override
